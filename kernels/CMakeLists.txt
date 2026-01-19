@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(auto_cuda_debugger_kernels LANGUAGES CXX CUDA)
+project(auto_debugger_kernels LANGUAGES CXX)
 
 set(CMAKE_CUDA_STANDARD 14)
 
