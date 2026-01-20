@@ -1,4 +1,3 @@
-import ast
 import asyncio
 import contextlib
 import io
@@ -17,6 +16,8 @@ from copy import copy, deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Literal, NamedTuple, override
+
+from pycparser import c_ast as ast
 
 
 def ast_replace(node: ast.AST, **changes) -> ast.AST:
@@ -1152,8 +1153,7 @@ class Args(NamedTuple):
 async def main(args: Args):
     if not args.source.exists() or not args.source.is_file():
         raise FileNotFoundError(
-            f"Source file '{
-                args.source}' does not exist or is not a regular file."
+            f"Source file '{args.source}' does not exist or is not a regular file."
         )
     if not os.access(args.source, os.R_OK):
         raise OSError(f"Source file '{args.source}' is not readable.")
@@ -1161,10 +1161,12 @@ async def main(args: Args):
         source = args.source.read_text()
     except OSError as e:
         raise OSError(
-            f"Failed to read source file '{
-                args.source}': {e}"
+            f"Failed to read source file '{args.source}': {e}"
         ) from e
-
+    if args.target not in ("cuda", "cpu", "hip", "mlu"):
+        raise ValueError(
+            f"Unsupported target '{args.target}'. Supported targets are 'cuda', 'cpu', 'hip', and 'mlu'."
+        )
     manager = ParTaskManager(
         err_msg=args.err_msg,
         text=source,
@@ -1297,6 +1299,7 @@ def cli_main(argv: "Sequence[str] | None" = None) -> None:
         epilog="Author: Shouyan Dong <shouyang.dong@gmail.com>",
     )
     parser.add_argument("source", type=Path, help="Input python source file")
+    parser.add_argument("target", type=str, help="Target platform")
     parser.add_argument(
         "--err-msg", type=str, required=True, help="Error message to look for"
     )
@@ -1326,6 +1329,7 @@ def cli_main(argv: "Sequence[str] | None" = None) -> None:
 
     args = Args(
         source=ns.source,
+        target=ns.target,
         err_msg=ns.err_msg,
         output=ns.output,
         backend=ns.backend,
