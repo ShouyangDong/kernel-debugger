@@ -35,11 +35,12 @@ python -m src.auto_debug <source_file> --error-msg <error_message>" -o <output_f
 | Parameter | Description |
 |-----------|-------------|
 | `source`  |Path to the input Python source file|
-|`--err-msg`|Error message to match (searched in stdout or stderr)
+| `target`  |Target platform|
+|`--err-msg`|Error message to match (searched in stdout or stderr)|
 |`-o, --output`| Path to the minimized output file|
 |`--backend`| Execution backend: `runner` (faster) or `subproc` (more stable), default `runner`|
 |`--timeout`| Timeout for each task in seconds, default 60|
-|`-j, --jobs`| Number of parallel jobs, default 1
+|`-j, --jobs`| Number of parallel jobs, default 1|
 
 
 ### Example
